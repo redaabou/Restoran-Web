@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model category {
+  category_id Int     @id @default(autoincrement())
+  name        String? @db.VarChar(255)
+  repas       repas[]
+}
+
+model repas {
+  repas_id    Int       @id @default(autoincrement())
+  name        String?   @unique(map: "name") @db.VarChar(255)
+  description String?   @db.Text
+  prix        Float?    @db.Float
+  image       String?   @db.VarChar(255)
+  category_id Int?
+  category    category? @relation(fields: [category_id], references: [category_id], onDelete: NoAction, onUpdate: NoAction, map: "repas_ibfk_1")
+
+  @@index([category_id], map: "category_id")
+}
+
+model subscriber {
+  subscriber_id Int         @id @default(autoincrement())
+  email         String?     @unique(map: "email") @db.VarChar(255)
+  restaurant_id Int?
+  restaurant    restaurant? @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: NoAction, onUpdate: NoAction, map: "fk_restaurant")
+
+  @@index([restaurant_id], map: "fk_restaurant")
+}
+
+model restaurant {
+  restaurant_id Int          @id @default(autoincrement())
+  name          String?      @db.VarChar(255)
+  location      String?      @db.VarChar(255)
+  email         String?      @db.VarChar(255)
+  phone         String?      @db.VarChar(20)
+  twitter       String?      @db.VarChar(255)
+  facebook      String?      @db.VarChar(255)
+  youtube       String?      @db.VarChar(255)
+  linkedin      String?      @db.VarChar(255)
+  employee      employee[]
+  subscriber    subscriber[]
+}
+
+model employee {
+  employee_id   Int         @id @default(autoincrement())
+  name          String?     @db.VarChar(255)
+  position      String?     @db.VarChar(255)
+  restaurant_id Int?
+  image         String?     @db.VarChar(750)
+  restaurant    restaurant? @relation(fields: [restaurant_id], references: [restaurant_id], onDelete: NoAction, onUpdate: NoAction, map: "employee_ibfk_1")
+
+  @@index([restaurant_id], map: "restaurant_id")
+}
